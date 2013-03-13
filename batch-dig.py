@@ -9,7 +9,7 @@
 #
 # Written by James Berger
 #
-# Last updated: March 12th 2013
+# Last updated: March 13th 2013
 #
 # Notes: Dig already has a batch
 # feature, this is just to test
