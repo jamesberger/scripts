@@ -9,7 +9,7 @@
 #
 # Written by James Berger
 #
-# Last updated: March 15th 2013
+# Last updated: March 20th 2013
 #
 # Notes: Dig already has a batch
 # feature, this is just to test
@@ -18,8 +18,9 @@
 #####################################
 
 
-from subprocess import call
-
+#from subprocess import call
+#Let's just import the entire thing so we can use all the functionality
+import subprocess
 
 with open('batch-whois-input.txt') as infile, open('batch-whois-output.txt', 'w') as outfile:
 
@@ -38,11 +39,26 @@ with open('batch-whois-input.txt') as infile, open('batch-whois-output.txt', 'w'
     print line
 
   print "\n\n"
-  print "Now running dig on the items in the input file...\n"
+  print "Now running WHOIS on the items in the input file...\n"
 
-  for line in infile:
+# Let's deprecate this temporarily
+#  for line in infile:
+#
+#    call(['whois', line.strip()], stdout=outfile)
 
-    call(['whois', line.strip()], stdout=outfile)
+  output = subprocess.check_output(['whois', '8.8.8.8'])
+
+  print 'There\'s %d bytest in output' % len(output)
+  print output
+
+  #Now let's show the output
+
+  print "The resulting output is as follows:\n"
+
+  output_file_read_only = open('batch-whois-output.txt','r')
+  for line in output_file_read_only:
+
+    print line
 
   print "Finished. More work sir?\n"
 
