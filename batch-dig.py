@@ -21,8 +21,6 @@
 from subprocess import call
 
 
-with open('batch-dig-input.txt') as infile, open('batch-dig-output.txt', 'w') as outfile:
-
   # We'll display what the input is so the user knows what to expect in the output file
   print "\n"
   print "*************************************************************************************************"
@@ -33,7 +31,18 @@ with open('batch-dig-input.txt') as infile, open('batch-dig-output.txt', 'w') as
   print "*************************************************************************************************\n\n"
   print "Your input is as follows: \n"
 
-  for line in infile:
+
+# Essentially, we want to run the following command:
+# dig +short google.com | head -n 1 | xargs whois | grep -i country | head -n 1 | cut -d' ' -f 9
+# 
+# This gets us the first IP for the domain, pipes it into whois, greps (-i for no case sensitivity) for the 
+# country, grabs the first result, then uses cut to get just the country name. This is a bit fragile, as it
+# relies on the output from these various commands being the same on any computer this is run on.
+
+
+# with open('batch-dig-input.txt') as infile, open('batch-dig-output.txt', 'w') as outfile:
+# 
+#   for line in infile:
   
     print line
 
