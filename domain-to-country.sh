@@ -37,7 +37,7 @@ domain_output_file=$2
 
 # The command 'file' returns the file type, so we can verify if it's a text
 # file without needed to worry about the file extension.
-file_type=file$1
+file_type=file $1
 
 # Here's our if statement for exiting the script if the input file doesn't
 # appear to be a valid text file
