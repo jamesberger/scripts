@@ -22,6 +22,8 @@
 #
 
 
+# Run clear to keep things tidy in the console
+clear
 
 # This will grab the first argument that's used when executing our script 
 # and parse it in as the file to read our domains in from.
@@ -37,17 +39,20 @@ domain_output_file=$2
 
 # The command 'file' returns the file type, so we can verify if it's a text
 # file without needed to worry about the file extension.
-file_type=file $1
+file_type=$(file $1)
 
 # Here's our if statement for exiting the script if the input file doesn't
 # appear to be a valid text file
-if [ $file_type="ASCII text" ]; then
- #do stuff to it
-elif [ $file_type!="ASCII text" ]; then
- echo "The input file you specified appears to be something other than a text file, this script requires an ASCII text input file to work."
- exit 1
+
+
+if  file $1 | grep -q "ASCII"   
+  then echo "The specified file is ASCII text." 
+else
+  echo "The specified file isn't ASCII text, I can't parse that. The file you provided has the following type: "
+  echo $file_type | cut -d' ' -f 2
 fi
 
+echo " "
 echo "Our file type is:"$file_type
 
 
