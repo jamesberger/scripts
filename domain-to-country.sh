@@ -1,25 +1,31 @@
 #!/bin/bash
-# 
+ 
 # #######################
 # ## Domain to Country ##
 # #######################
-#
+
+
+# ---------------------------------------------------------
 # Description:
 # ---------------------------------------------------------
 # This is a simple bash script that will output the country 
 # for a given domain name in a file based on the contents of
 # the input file that it's been given.
-#
+
+
+# ---------------------------------------------------------
 # What this script is for:
 # ---------------------------------------------------------
 # Use this script if you want to get a list of what country
 # a given domain is coming from.
-#
+
+
+# ---------------------------------------------------------
 # Author:
 # ---------------------------------------------------------
 # Written by James Berger
 # Last updated: May 1st 2013
-#
+
 
 
 # Below is an example comand that has the functionality we want from this script, just not in batch-friendly format
