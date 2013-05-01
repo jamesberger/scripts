@@ -43,18 +43,20 @@ domain_input_file=$1
 # and parse it in as the file to put the results in.
 domain_output_file=$2
 
+# create newline variable so it's a little easier to output
+newline=$'\n'
+
 
 # Create a simple header and show what the input and output files are
 
 echo "--------------------------------------------------------"
 echo "  Domain to Country Lookup Tool, v0.2"
-echo -e  "\n \n"
+echo $newline
 echo "  User specified input file: "$1
 echo "  User specified output file: "$2
-echo -e  "\n"
+echo $newline
 echo "--------------------------------------------------------"
-echo -e  "\n"
-
+echo $newline
 
 
 # Here we'll verify that the specified input file is actually a valid text file
@@ -63,15 +65,33 @@ echo -e  "\n"
 # file without needed to worry about the file extension.
 file_type=$(file $1)
 
+# This should grab just the last bit from the output of file so that we can
+# give our user the file type without all of the other stuff that comes from
+# the file command. But it's not working right now.
+# file_type_simple=${$file_type | cut -d' ' -f 2}
+
 # Here's our if statement for exiting the script if the input file doesn't
 # appear to be a valid text file
 echo "Running input file type check..."
+echo $newline
 
 if  file $1 | grep -q "ASCII"   
   then echo "File check status: Good. The specified file is ASCII text." 
 else
-  echo "File check status: Bad. The specified file isn't ASCII text, I can't parse that. The file you provided has the following type: "
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "!! File check status: Bad.                                  !!"
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  echo "!! The specified file isn't ASCII text, I can't parse that. !!"
+  echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" 
+  echo $newline
+  echo $newline
+  echo "--------------------------------------------------------------"
+  echo " The file you provided has the following type: " 
+  echo $newline
   echo $file_type | cut -d' ' -f 2
+  echo "--------------------------------------------------------------"
+#  This is for the simple file type, not working right now
+#  echo $file_type_simple
 fi
 
 echo " "
