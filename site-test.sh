@@ -38,7 +38,7 @@ echo -e "-------"
 
 echo -e "\n"
 
-# This logs into the site using the creds they've provided for us and the form fields from their login form.
+# This logs into the site using the creds you specify and the form fields from the login form on the target site.
 # Note: You may have to update these fields depending on how the form on the target page is requesting the data.
 # If the form asks for a variable "userName", you're good. If it's called something different, then change
 # "userName" to whatever it's looking for.
