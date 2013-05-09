@@ -16,9 +16,10 @@
 # If not, it alerts you.
 
 #Setting our variables
-results_file=/tmp/simple-page-check-results.html
+results_file=/tmp/simple-page-check_server-page.html
 target_url=https://www.your-site-goes-here.com/login.html
 phrase_to_check_for=PutYourPhraseThatShowsUpOnTheLoggedInPageHere #note - need to fix this so you can set it to something with spaces in it instead of a single word
+log_file=/tmp/simple-page-check_server-status-log.txt
 
 # Run clear to keep things tidy
 clear
@@ -65,10 +66,14 @@ echo -e "... \n"
 
 
 if  cat $results_file | grep -q $phrase_to_check_for
-  then echo "Able to successfully log in." 
-else
-  echo "Failed to log in."
+  then 
+    echo "Able to successfully log in." 
+    echo -e "\r\nLogin successful for $(date)" >> $log_file
+    echo -e "Updating " $log_file "now with the result for the login attempt on $(date)."
+  else
+    echo "Failed to log in."
+    echo -e "\r\nLogin failed for $(date)" >> $log_file
+    echo -e "Updating " $log_file "now with the result for the login attempt on $(date)."
 fi
 
 echo -e "\n\n\n"
-
