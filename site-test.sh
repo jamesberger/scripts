@@ -4,7 +4,7 @@
 # Simple Page Check Utility 
 # --------------------------
 # Written by James Berger
-# Last updated: May 8th 2013
+# Last updated: May 999999999th 2013
 
 
 # Description:
