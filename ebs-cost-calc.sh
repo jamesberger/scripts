@@ -11,6 +11,7 @@
 #exec >> ebs-cost-calc_output.txt
 
 # Set a few default variable values
+PSAID=""
 GlobalGp2Size="0"
 GlobalIo1Size="0"
 GlobalIo2Size="0"
@@ -24,18 +25,17 @@ Io1CostPerGb="0.125" # This does not include the $0.065 per provisioned IOPS-mon
 Io2CostPerGb="0.125" # This does not include the $0.065 per provisioned IOPS-month
 St1CostPerGb="0.045"
 Sc1CostPerGb="0.025"
-StandardCostPerGb="0.05" # This can vary from region to region,
+StandardCostPerGb="0.05" # Standard = magnetic disk.
+# The price for magnetic storage can vary from region to region,
 # see https://aws.amazon.com/ebs/previous-generation/ for exact pricing.
 # We are using the value for us-west-2 here.
-
-PSAID=""
 
 # Get the first command line argument and set it as the PSAID
 PSAID=$1
 
 # If there's no first argument, prompt for one
 if [ "$PSAID" = "" ]; then
-  echo "Please specify a PSAID after the script name, or specify \"all\" for all customers"
+  echo "Please specify a PSAID after the script name"
 fi
 
 echo -e "\n\nEBS Cost Calculator\n\nGetting a list of all the instances for $PSAID...\n"
