@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 # Set a few default variable values
-GlobalGp2Size=""
-GlobalIo1Size=""
-GlobalIo2Size=""
-GlobalSt1Size=""
-GlobalSc1Size=""
-GlobalStandardSize=""
+GlobalGp2Size="0"
+GlobalIo1Size="0"
+GlobalIo2Size="0"
+GlobalSt1Size="0"
+GlobalSc1Size="0"
+GlobalStandardSize="0"
 PSAID=""
 
 # Get the first command line argument and set it as the PSAID
@@ -16,6 +16,8 @@ PSAID=$1
 if [ "$PSAID" = "" ]; then
   echo "Please specify a PSAID after the script name, or specify \"all\" for all customers"
 fi
+
+echo -e "\n\nEBS Cost Calculator\n\nGetting a list of all the instances for $PSAID...\n"
 
 # Get a list of the instances for the specified PSAID
 DescribeInstanceOutput="aws ec2 describe-instances --filters=Name=tag:PSA_ID,Values=${PSAID}"
@@ -28,6 +30,15 @@ IFS=',' read -r -a InstancesArray <<< $ListOfInstances
 
 # TESTING: Echo the Instance ID value from the first element of the array to test
 #echo -e "First instance in the array is ${InstancesArray[0]}\n\n"
+
+echo -e "\nHere's a list of all the instances I found for the PSAID $PSAID: \n"
+for InstanceId in "${InstancesArray[@]}"
+ do
+   echo $InstanceId
+done
+
+
+echo -e "\n\nGetting a list of all volumes I found for the each of the instances above...\n"
 
 # Get the volume IDs for each instance in the array
 for InstanceId in "${InstancesArray[@]}"
@@ -53,7 +64,7 @@ done
 
 # Testing to verify we get the name of every volume for all the instances and
 # that each element of the array contains only a single volume
-echo -e "Here's a list of all the volumes for every instance matching the PSAID $PSAID: \n"
+echo -e "\nHere's a list of all the volumes for every instance matching the PSAID $PSAID: \n"
 for Volume in "${GlobalVolumesArray[@]}"
  do
    echo $Volume
@@ -61,7 +72,7 @@ done
 
 # Get the size and type of each volume in the array
 
-echo -e "Getting size and type for each volume. Computing total size for each volume type...\n\n"
+echo -e "\n\nGetting size and type for each volume. Computing total size for each volume type...\n"
 for Volume in "${GlobalVolumesArray[@]}"
 do
   # Get the volume size and type
@@ -102,14 +113,15 @@ do
     GlobalStandardSize=$((GlobalStandardSize + VolumeSize))
   fi
 
-  echo -e "The total gp2 volume size is $GlobalGp2Size"
-  echo -e "The total io1 volume size is $GlobalIo1Size"
-  echo -e "The total io2 volume size is $GlobalIo2Size"
-  echo -e "The total st1 volume size is $GlobalSt1Size"
-  echo -e "The total sc1 volume size is $GlobalSc1Size"
-  echo -e "The total magentic volume size is $GlobalStandardSize"
 done
 
-echo -e "Computing total cost for each volume type...\n\n"
+echo -e "The total gp2 volume size is $GlobalGp2Size GB"
+echo -e "The total io1 volume size is $GlobalIo1Size GB"
+echo -e "The total io2 volume size is $GlobalIo2Size GB"
+echo -e "The total st1 volume size is $GlobalSt1Size GB"
+echo -e "The total sc1 volume size is $GlobalSc1Size GB"
+echo -e "The total magentic volume size is $GlobalStandardSize GB"
+
+echo -e "\n\nComputing total cost for each volume type...\n\n"
 
 # Compute costs here
