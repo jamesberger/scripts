@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+# This script gets a list of AWS instances matching a certain tag value and then
+# it gets a list of all the EBS volumes for those instances.
+# Then it goes through each volume, gets the volume size and adds it to a global
+# sum for the total GB of each EBS volume type (gp2, io1, etc),
+# Once there's a global sum for each EBS volume type, it computes the total cost
+# for each volume type, and the total cost for all volumes combined.
+
+# If you need to save the output to a text file, uncomment the line below:
+#exec >> ebs-cost-calc_output.txt
+
 # Set a few default variable values
 GlobalGp2Size="0"
 GlobalIo1Size="0"
@@ -7,6 +17,17 @@ GlobalIo2Size="0"
 GlobalSt1Size="0"
 GlobalSc1Size="0"
 GlobalStandardSize="0"
+
+# Price data pulled from https://aws.amazon.com/ebs/pricing/
+Gp2CostPerGb="0.10"
+Io1CostPerGb="0.125" # This does not include the $0.065 per provisioned IOPS-month
+Io2CostPerGb="0.125" # This does not include the $0.065 per provisioned IOPS-month
+St1CostPerGb="0.045"
+Sc1CostPerGb="0.025"
+StandardCostPerGb="0.05" # This can vary from region to region,
+# see https://aws.amazon.com/ebs/previous-generation/ for exact pricing.
+# We are using the value for us-west-2 here.
+
 PSAID=""
 
 # Get the first command line argument and set it as the PSAID
@@ -27,9 +48,6 @@ ListOfInstances=$($DescribeInstanceOutput | grep InstanceId | cut -d\" -f 4 | tr
 
 # Build an array from the comma separated list of instances
 IFS=',' read -r -a InstancesArray <<< $ListOfInstances
-
-# TESTING: Echo the Instance ID value from the first element of the array to test
-#echo -e "First instance in the array is ${InstancesArray[0]}\n\n"
 
 echo -e "\nHere's a list of all the instances I found for the PSAID $PSAID: \n"
 for InstanceId in "${InstancesArray[@]}"
@@ -56,10 +74,6 @@ for InstanceId in "${InstancesArray[@]}"
     GlobalVolumesArray+=("$Volume")
     done
 
-  # Testing in loop
-  #echo -e "Here is the list of volumes for $InstanceId:"
-  #echo $ListOfVolumesForInstance
-  #echo -e "\n\n"
 done
 
 # Testing to verify we get the name of every volume for all the instances and
@@ -122,6 +136,24 @@ echo -e "The total st1 volume size is $GlobalSt1Size GB"
 echo -e "The total sc1 volume size is $GlobalSc1Size GB"
 echo -e "The total magentic volume size is $GlobalStandardSize GB"
 
-echo -e "\n\nComputing total cost for each volume type...\n\n"
+echo -e "\n\nComputing total cost for each volume type...\n"
 
-# Compute costs here
+# Using Awk here because the Bash shell is horrible at floating point arithmetic
+
+TotalGp2Cost=$(awk -v price=$Gp2CostPerGb -v qty=$GlobalGp2Size 'BEGIN{TotalGp2Cost=(price*qty); print TotalGp2Cost;}')
+TotalIo1Cost=$(awk -v price=$Io1CostPerGb -v qty=$GlobalIo1Size 'BEGIN{TotalIo1Cost=(price*qty); print TotalIo1Cost;}')
+TotalIo2Cost=$(awk -v price=$Io2CostPerGb -v qty=$GlobalIo2Size 'BEGIN{TotalIo2Cost=(price*qty); print TotalIo2Cost;}')
+TotalSt1Cost=$(awk -v price=$St1CostPerGb -v qty=$GlobalSt1Size 'BEGIN{TotalSt1Cost=(price*qty); print TotalSt1Cost;}')
+TotalSc1Cost=$(awk -v price=$Sc1CostPerGb -v qty=$GlobalSc1Size 'BEGIN{TotalSc1Cost=(price*qty); print TotalSc1Cost;}')
+TotalStandardCost=$(awk -v price=$StandardCostPerGb -v qty=$GlobalStandardSize 'BEGIN{TotalStandardCost=(price*qty); print TotalStandardCost;}')
+
+echo -e "The total cost of all gp2 storage for $PSAID is \$$TotalGp2Cost per month."
+echo -e "The total cost of all io1 storage for $PSAID is \$$TotalIo1Cost per month."
+echo -e "The total cost of all io2 storage for $PSAID is \$$TotalIo2Cost per month."
+echo -e "The total cost of all st1 storage for $PSAID is \$$TotalSt1Cost per month."
+echo -e "The total cost of all sc1 storage for $PSAID is \$$TotalSc1Cost per month."
+echo -e "The total cost of all magnetic storage for $PSAID is \$$TotalStandardCost per month."
+
+TotalStorageCombinedCost=$(awk "BEGIN {print $TotalGp2Cost+$TotalIo1Cost+$TotalIo2Cost+$TotalSt1Cost+$TotalSc1Cost+$TotalStandardCost; exit}")
+
+echo -e "\nThe combined cost of all storage is: \n \$$TotalStorageCombinedCost per month.\n\n"
