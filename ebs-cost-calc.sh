@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
 # Set a few default variable values
+GlobalGp2Size=""
+GlobalIo1Size=""
+GlobalIo2Size=""
+GlobalSt1Size=""
+GlobalSc1Size=""
+GlobalStandardSize=""
 PSAID=""
 
 # Get the first command line argument and set it as the PSAID
@@ -22,7 +28,6 @@ IFS=',' read -r -a InstancesArray <<< $ListOfInstances
 
 # TESTING: Echo the Instance ID value from the first element of the array to test
 #echo -e "First instance in the array is ${InstancesArray[0]}\n\n"
-
 
 # Get the volume IDs for each instance in the array
 for InstanceId in "${InstancesArray[@]}"
@@ -55,40 +60,56 @@ for Volume in "${GlobalVolumesArray[@]}"
 done
 
 # Get the size and type of each volume in the array
-# for Volume in "${GlobalVolumesArray[@]}"
-# do
-#   # Get the volume size and type
-#   VolumeTypeAndSizeRawOutput="aws ec2 describe-volumes --volume-ids $Volume"
-#   VolumeTypeAndSizeCleanedOutput=$($VolumeTypeAndSizeRawOutput | egrep 'VolumeType|Size')
-#
-#   echo $VolumeTypeAndSizeCleanedOutput
-# done
 
-
-# Get the size and type of each volume in the array
+echo -e "Getting size and type for each volume. Computing total size for each volume type...\n\n"
 for Volume in "${GlobalVolumesArray[@]}"
 do
   # Get the volume size and type
   VolumeTypeRawOutput="aws ec2 describe-volumes --volume-ids $Volume"
   VolumeType=$($VolumeTypeRawOutput | egrep 'VolumeType' | cut -d'"' -f 4)
 
+  # Check to see what type the volume is, and increment a global variable
+  # based on the volume type and size so the global variable matches the
+  # combined size of all volumes of that type
+
   if [[ $VolumeType = "gp2" ]]; then
     VolumeSize=$($VolumeTypeRawOutput | egrep 'Size' | cut -d' ' -f 14)
-    echo -e "Volume size is $VolumeSize"
+    GlobalGp2Size=$((GlobalGp2Size + VolumeSize))
   fi
 
-  #echo $VolumeType
+  if [[ $VolumeType = "io1" ]]; then
+    VolumeSize=$($VolumeTypeRawOutput | egrep 'Size' | cut -d' ' -f 14)
+    GlobalIo1Size=$((GlobalIo1Size + VolumeSize))
+  fi
+
+  if [[ $VolumeType = "io2" ]]; then
+    VolumeSize=$($VolumeTypeRawOutput | egrep 'Size' | cut -d' ' -f 14)
+    GlobalIo2Size=$((GlobalIo2Size + VolumeSize))
+  fi
+
+  if [[ $VolumeType = "st1" ]]; then
+    VolumeSize=$($VolumeTypeRawOutput | egrep 'Size' | cut -d' ' -f 14)
+    GlobalSt1Size=$((GlobalSt1Size + VolumeSize))
+  fi
+
+  if [[ $VolumeType = "sc1" ]]; then
+    VolumeSize=$($VolumeTypeRawOutput | egrep 'Size' | cut -d' ' -f 14)
+    GlobalSc1Size=$((GlobalSc1Size + VolumeSize))
+  fi
+
+  if [[ $VolumeType = "standard" ]]; then
+    VolumeSize=$($VolumeTypeRawOutput | egrep 'Size' | cut -d' ' -f 14)
+    GlobalStandardSize=$((GlobalStandardSize + VolumeSize))
+  fi
+
+  echo -e "The total gp2 volume size is $GlobalGp2Size"
+  echo -e "The total io1 volume size is $GlobalIo1Size"
+  echo -e "The total io2 volume size is $GlobalIo2Size"
+  echo -e "The total st1 volume size is $GlobalSt1Size"
+  echo -e "The total sc1 volume size is $GlobalSc1Size"
+  echo -e "The total magentic volume size is $GlobalStandardSize"
 done
 
-# if volumeType = gp2
-#   get size
-#   size > add to size array
+echo -e "Computing total cost for each volume type...\n\n"
 
-
-
-# 5. For each volume, add size to size counter for the volume type
-# E.g., if test401 has 100 GB of GP2 and 500 GB of ST1, the counter values would look like
-# gp2: 100
-# io2: 0
-# i01: 0
-# st1: 500
+# Compute costs here
