@@ -48,21 +48,42 @@ done
 
 # Testing to verify we get the name of every volume for all the instances and
 # that each element of the array contains only a single volume
-#echo -e "Here's a list of all the volumes for every instance matching the PSAID $PSAID: \n"
-#for Volume in "${GlobalVolumesArray[@]}"
-#  do
-#    echo $Volume
-#done
+echo -e "Here's a list of all the volumes for every instance matching the PSAID $PSAID: \n"
+for Volume in "${GlobalVolumesArray[@]}"
+ do
+   echo $Volume
+done
+
+# Get the size and type of each volume in the array
+# for Volume in "${GlobalVolumesArray[@]}"
+# do
+#   # Get the volume size and type
+#   VolumeTypeAndSizeRawOutput="aws ec2 describe-volumes --volume-ids $Volume"
+#   VolumeTypeAndSizeCleanedOutput=$($VolumeTypeAndSizeRawOutput | egrep 'VolumeType|Size')
+#
+#   echo $VolumeTypeAndSizeCleanedOutput
+# done
+
 
 # Get the size and type of each volume in the array
 for Volume in "${GlobalVolumesArray[@]}"
 do
   # Get the volume size and type
-  VolumeTypeAndSizeRawOutput="aws ec2 describe-volumes --volume-ids $Volume"
-  VolumeTypeAndSizeCleanedOutput=$($VolumeTypeAndSizeRawOutput | egrep 'VolumeType|Size')
+  VolumeTypeRawOutput="aws ec2 describe-volumes --volume-ids $Volume"
+  VolumeType=$($VolumeTypeRawOutput | egrep 'VolumeType' | cut -d'"' -f 4)
 
-  echo $VolumeTypeAndSizeCleanedOutput
+  if [[ $VolumeType = "gp2" ]]; then
+    VolumeSize=$($VolumeTypeRawOutput | egrep 'Size' | cut -d' ' -f 14)
+    echo -e "Volume size is $VolumeSize"
+  fi
+
+  #echo $VolumeType
 done
+
+# if volumeType = gp2
+#   get size
+#   size > add to size array
+
 
 
 # 5. For each volume, add size to size counter for the volume type
