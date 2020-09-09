@@ -134,7 +134,7 @@ echo -e "The total io1 volume size is $GlobalIo1Size GB"
 echo -e "The total io2 volume size is $GlobalIo2Size GB"
 echo -e "The total st1 volume size is $GlobalSt1Size GB"
 echo -e "The total sc1 volume size is $GlobalSc1Size GB"
-echo -e "The total magentic volume size is $GlobalStandardSize GB"
+echo -e "The total magnetic volume size is $GlobalStandardSize GB"
 
 echo -e "\n\nComputing total cost for each volume type...\n"
 
